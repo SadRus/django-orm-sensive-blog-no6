@@ -16,7 +16,9 @@ class PostQuerySet(models.QuerySet):
         return popular_posts
 
     def fetch_with_comments_count(self):
-        # Позволяет избежать момента с двумя annotate в одном запросе, в одном запросе формируем список для всех постов сразу
+        # Позволяет избежать момент с двумя annotate в одном запросе.
+        # Создаем атрибут с кол-вом комментариев на уровне Питона
+        # для каждого поста запроса.
         posts_with_comments = self.prefetch_related('comments')
         posts = []
         for post in posts_with_comments:
@@ -62,7 +64,8 @@ class Post(models.Model):
 
 class TagQuerySet(models.QuerySet):
     def popular(self):
-        popular_tags = self.annotate(posts_count=Count('posts')).order_by('-posts_count')
+        popular_tags = self.annotate(posts_count=Count('posts')) \
+                           .order_by('-posts_count')
         return popular_tags
 
 
